@@ -1,0 +1,225 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String?   @map("password_hash")
+  name          String
+  phone         String?
+  role          String    @default("user")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  orders          Order[]
+  cartItems        CartItem[]
+  reviews          Review[]
+  qnas             QnA[]
+  wishlists        Wishlist[]
+  shippingAddresses ShippingAddress[]
+  points           Point[]
+}
+
+model Category {
+  id          String     @id @default(cuid())
+  slug        String     @unique
+  name        String
+  description String?
+  order       Int        @default(0)
+  parentId    String?    @map("parent_id")
+  parent       Category?  @relation("CategoryToCategory", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryToCategory")
+  products    Product[]
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  categoryId  String   @map("category_id")
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  name        String
+  slug        String   @unique
+  description String?  @db.Text
+  price       Int
+  salePrice   Int?     @map("sale_price")
+  stock       Int      @default(0)
+  status      String   @default("active")
+  metaTitle   String?  @map("meta_title")
+  metaDesc    String?  @map("meta_desc") @db.Text
+  tags        String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  images    ProductImage[]
+  options   ProductOption[]
+  orderItems OrderItem[]
+  cartItems  CartItem[]
+  reviews   Review[]
+  qnas      QnA[]
+  wishlists Wishlist[]
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String  @map("product_id")
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  order     Int     @default(0)
+}
+
+model ProductOption {
+  id        String   @id @default(cuid())
+  productId String   @map("product_id")
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name      String
+  value     String
+  priceDiff Int      @default(0) @map("price_diff")
+  stock     Int      @default(0)
+}
+
+model Order {
+  id            String   @id @default(cuid())
+  userId        String?  @map("user_id")
+  user          User?    @relation(fields: [userId], references: [id])
+  orderNumber   String   @unique @map("order_number")
+  status        String   @default("pending")
+  totalAmount   Int      @map("total_amount")
+  shippingFee   Int      @default(0) @map("shipping_fee")
+  receiverName  String   @map("receiver_name")
+  receiverPhone String   @map("receiver_phone")
+  receiverAddr  String   @map("receiver_addr") @db.Text
+  memo          String?  @db.Text
+  paidAt        DateTime? @map("paid_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  items OrderItem[]
+}
+
+model OrderItem {
+  id         String  @id @default(cuid())
+  orderId    String  @map("order_id")
+  order      Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId  String  @map("product_id")
+  product    Product @relation(fields: [productId], references: [id])
+  optionName String? @map("option_name")
+  quantity   Int
+  price      Int
+}
+
+model CartItem {
+  id         String  @id @default(cuid())
+  userId     String? @map("user_id")
+  user       User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId  String? @map("session_id")
+  productId  String  @map("product_id")
+  product    Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  optionName String? @map("option_name")
+  quantity   Int     @default(1)
+  createdAt  DateTime @default(now()) @map("created_at")
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String   @map("product_id")
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderId   String?  @map("order_id")
+  rating    Int
+  content   String   @db.Text
+  imageUrl  String?  @map("image_url")
+  createdAt DateTime @default(now()) @map("created_at")
+}
+
+model QnA {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String   @map("product_id")
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  question  String   @db.Text
+  answer    String?  @db.Text
+  status    String   @default("pending")
+  createdAt DateTime @default(now()) @map("created_at")
+  answeredAt DateTime? @map("answered_at")
+}
+
+model Wishlist {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String   @map("product_id")
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([userId, productId])
+}
+
+model Coupon {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  type        String
+  value       Int
+  minAmount   Int?      @map("min_amount")
+  startAt     DateTime  @map("start_at")
+  endAt       DateTime  @map("end_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+}
+
+model Point {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount    Int
+  reason    String?
+  createdAt DateTime @default(now()) @map("created_at")
+}
+
+model Banner {
+  id        String   @id @default(cuid())
+  title     String?
+  imageUrl  String   @map("image_url")
+  linkUrl   String?  @map("link_url")
+  order     Int      @default(0)
+  startAt   DateTime @map("start_at")
+  endAt     DateTime  @map("end_at")
+  createdAt DateTime @default(now()) @map("created_at")
+}
+
+model Notice {
+  id        String   @id @default(cuid())
+  title     String
+  content   String   @db.Text
+  isPinned  Boolean  @default(false) @map("is_pinned")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model ShippingAddress {
+  id          String  @id @default(cuid())
+  userId      String  @map("user_id")
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  receiverName String @map("receiver_name")
+  phone       String
+  zipcode     String
+  address     String  @db.Text
+  addressDetail String? @map("address_detail")
+  isDefault   Boolean @default(false) @map("is_default")
+  createdAt   DateTime @default(now()) @map("created_at")
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  name         String
+  role         String   @default("admin")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+}
