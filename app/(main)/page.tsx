@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getCurtainPhotos, getServicePhotos, getHeroPhoto, PHONE_SERVICE_IMAGE } from "@/lib/pexels";
 import StatsCounter from "../components/StatsCounter";
 import ReviewSection from "../components/ReviewSection";
 import QuoteButton from "../components/QuoteButton";
@@ -11,13 +10,44 @@ const serviceSteps = [
   { step: "03", title: "꼼꼼한 시공", desc: "정확한 제작과 시공으로 만족스러운 결과를 드립니다." },
 ];
 
-export default async function HomePage() {
-  const [heroPhoto, curtainPhotos, servicePhotos] = await Promise.all([
-    getHeroPhoto(),
-    getCurtainPhotos(15),
-    getServicePhotos(),
-  ]);
-  const portfolioPhotos = curtainPhotos.slice(0, 6);
+// 실제 시공 사진 (ymcurtain.com 시공갤러리)
+const realConstructionPhotos = [
+  {
+    src: "https://lh3.googleusercontent.com/UZ8PDXZMTmqgqbgRdVFBfkAsuzbzOQVPxqd2WuQXra6FOur7Ue792L9jWNA6Iu7FRgliBqfXyQjnt49TtidaBGvvpIPIS3zJTSLgiFlw57pPIcUqL-yJ=s0",
+    alt: "서래마을 빌라 시공사진",
+  },
+  {
+    src: "https://lh3.googleusercontent.com/2ajkXKbB3WN5v2lNv-7v90CT145LkyCnLPwg-5xk7qA8S8KrX862-EDt0tlYx1nYEZyJh_MmMgT0DcKX8DuqDE8BkU9u60D6Ccs5Tz2-TlmWJQn5LvX4d6o=s0",
+    alt: "조형미관 갤러리",
+  },
+  {
+    src: "https://lh3.googleusercontent.com/lTuaZIryRxGqayVtPJ2PQrd1tre5FZdUZieXVTDfQIBoH9wjOUxlGWaIz3fITpS4k4TAzsX1qPwmxAlq-e9xz0o9TWRTzk3JNKqdQF0ROEEz-oy8vmFszl8=s0",
+    alt: "서초동 로이지움",
+  },
+  {
+    src: "https://lh3.googleusercontent.com/pZZlZMFlb_KVNHryYjx-FYl3uvztkeKDHiumOJNZT0TMV-ul9IWaxKbKCj4nlD4HQEWDeDGZNlX0O6jiRjJxxnwDl1hyVGTh1TJARJm6wYZgxS_BlsLVng=s0",
+    alt: "송도 IBS 타워",
+  },
+  {
+    src: "https://lh3.googleusercontent.com/EYGNkxcuKF08ADF2WjIzPIhFkGHOlgvediMNwTy20_xjltG3CJhNOAZ2uph_lEfl_4M_2OAuQ7BDfnqOnL4rB4zc0IJOsSL78AWn1rVajRywBrhcq6NG=s0",
+    alt: "용산 래미안 더센트럴",
+  },
+  {
+    src: "https://lh3.googleusercontent.com/ajnxGMg9Oqc_gEtpGnmNrvujrZg1McbABNOLWIdtOSjlgW-rn2tBPif_Tm4B60WhCYMIXxZ2USUo8IKvaFSEL411Swt7Hx-vf876_hiG-7413t1JBs4yUg=s0",
+    alt: "방배동 레드 우드 시공",
+  },
+  {
+    src: "https://lh3.googleusercontent.com/X4Jkb64f7aoT77HhRiXiAGNE8hh1lOk-osb06V3DIskoyjW3EZOaTmNy0ZJMCsTlQ_8CXjqdi9lm-ae6pbgA8ayZ39XEEi_tDmZDnywHEOKo11N-RkNS5A=s0",
+    alt: "역삼동 회사사옥 대표실",
+  },
+  {
+    src: "https://lh3.googleusercontent.com/HrZks_etvKfNs58QpnfEx2lYMRxu5Wy5ldmgQFBD7301hOJQp5_pszXoa1Oi6SCTXiZR9nZMHeJSs_WAjE40p4bFBHZ6Z6Em87egZ9NGeCpLXLbhJA6Bq1Y=s0",
+    alt: "방배역 스터디 카페",
+  },
+];
+
+export default function HomePage() {
+  const portfolioPhotos = realConstructionPhotos;
 
   return (
     <>
@@ -96,7 +126,7 @@ export default async function HomePage() {
       {/* 고객 후기 */}
       <ReviewSection />
 
-      {/* 시공 사례 - Pexels curtain 검색 결과 */}
+      {/* 시공 사례 - 실제 시공 갤러리 */}
       <section className="py-24 md:py-32 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-12">
@@ -108,20 +138,21 @@ export default async function HomePage() {
               전체 보기 →
             </Link>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 md:grid-rows-3 gap-4 md:gap-5">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5 auto-rows-fr">
             {portfolioPhotos.map((item, i) => (
               <Link
                 key={i}
                 href="/portfolio"
                 className={`relative overflow-hidden rounded-2xl group ${i === 0 ? "md:col-span-2 md:row-span-2" : ""}`}
               >
-                <div className={`relative ${i === 0 ? "aspect-[4/3] md:aspect-auto md:min-h-[300px]" : "aspect-[4/3]"}`}>
+                <div className={`relative ${i === 0 ? "aspect-[4/3] md:aspect-auto md:h-full" : "aspect-[4/3]"}`}>
                   <Image
                     src={item.src}
                     alt={item.alt}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                     sizes="(max-width:768px) 50vw, (max-width:1024px) 33vw, 420px"
+                    unoptimized
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   <span className="absolute bottom-4 left-4 right-4 text-white font-medium text-sm opacity-0 group-hover:opacity-100 transition-opacity drop-shadow">
