@@ -4,66 +4,70 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 
 interface Review {
-  id: number;
+  id: string;
   name: string;
   location: string;
   rating: number;
   comment: string;
-  image?: string;
+  imageUrl: string | null;
   date: string;
 }
 
-const reviews: Review[] = [
+// 폴백 데이터 (API 실패 시)
+const fallbackReviews: Review[] = [
   {
-    id: 1,
+    id: "1",
     name: "김*은",
     location: "강남구",
     rating: 5,
     comment: "친절하게 상담해 주시고 시공도 깔끔하게 해주셨어요. 집 분위기가 확 달라졌습니다. 추천합니다!",
-    image: "https://images.pexels.com/photos/6585751/pexels-photo-6585751.jpeg?auto=compress&cs=tinysrgb&w=600",
+    imageUrl: "https://images.pexels.com/photos/6585751/pexels-photo-6585751.jpeg?auto=compress&cs=tinysrgb&w=600",
     date: "2026-05-15",
   },
   {
-    id: 2,
+    id: "2",
     name: "이*호",
     location: "송파구",
     rating: 5,
     comment: "무료 방문 실측 서비스가 너무 좋았어요. 여러 샘플도 보여주시고 꼼꼼하게 설명해주셔서 만족스럽습니다.",
-    image: "https://images.pexels.com/photos/6585607/pexels-photo-6585607.jpeg?auto=compress&cs=tinysrgb&w=600",
+    imageUrl: "https://images.pexels.com/photos/6585607/pexels-photo-6585607.jpeg?auto=compress&cs=tinysrgb&w=600",
     date: "2026-05-10",
   },
   {
-    id: 3,
+    id: "3",
     name: "박*영",
     location: "서초구",
     rating: 5,
     comment: "가격도 합리적이고 시공 품질도 훌륭합니다. 15년 경력이 느껴지는 전문성이었어요. 감사합니다.",
-    image: "https://images.pexels.com/photos/6969831/pexels-photo-6969831.jpeg?auto=compress&cs=tinysrgb&w=600",
+    imageUrl: "https://images.pexels.com/photos/6969831/pexels-photo-6969831.jpeg?auto=compress&cs=tinysrgb&w=600",
     date: "2026-04-28",
-  },
-  {
-    id: 4,
-    name: "최*수",
-    location: "마포구",
-    rating: 5,
-    comment: "전화 문의부터 시공 완료까지 정말 신속하고 전문적이었습니다. 다음에도 꼭 이용하겠습니다!",
-    image: "https://images.pexels.com/photos/7214153/pexels-photo-7214153.jpeg?auto=compress&cs=tinysrgb&w=600",
-    date: "2026-04-20",
-  },
-  {
-    id: 5,
-    name: "정*아",
-    location: "용산구",
-    rating: 5,
-    comment: "블라인드 설치 후 햇빛 차단이 정말 잘 되네요. 실장님이 추천해주신 제품이 딱이었어요.",
-    image: "https://images.pexels.com/photos/6969896/pexels-photo-6969896.jpeg?auto=compress&cs=tinysrgb&w=600",
-    date: "2026-04-05",
   },
 ];
 
 export default function ReviewSection() {
+  const [reviews, setReviews] = useState<Review[]>(fallbackReviews);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+
+  useEffect(() => {
+    // API에서 후기 데이터 가져오기
+    const fetchReviews = async () => {
+      try {
+        const res = await fetch("/api/service-reviews?public=true");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.length > 0) {
+            setReviews(data);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch reviews:", error);
+        // 실패 시 폴백 데이터 사용
+      }
+    };
+
+    fetchReviews();
+  }, []);
 
   useEffect(() => {
     if (!isAutoPlaying) return;
@@ -110,9 +114,9 @@ export default function ReviewSection() {
             <div className="md:flex">
               {/* 이미지 */}
               <div className="md:w-5/12 relative aspect-[4/3] md:aspect-auto md:min-h-[400px]">
-                {reviews[currentIndex].image && (
+                {reviews[currentIndex].imageUrl && (
                   <Image
-                    src={reviews[currentIndex].image}
+                    src={reviews[currentIndex].imageUrl}
                     alt={`${reviews[currentIndex].name}님의 시공 사례`}
                     fill
                     className="object-cover"

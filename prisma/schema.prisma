@@ -223,3 +223,40 @@ model AdminUser {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 }
+
+// 견적 신청
+model Quote {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String
+  location  String
+  message   String?  @db.Text
+  status    String   @default("pending") // pending, contacted, completed, cancelled
+  memo      String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+// 시공 후기
+model ServiceReview {
+  id        String   @id @default(cuid())
+  name      String
+  location  String
+  rating    Int      @default(5)
+  comment   String   @db.Text
+  imageUrl  String?  @map("image_url")
+  date      DateTime @default(now())
+  isVisible Boolean  @default(true) @map("is_visible")
+  order     Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+// 사이트 통계
+model SiteStats {
+  id               String   @id @default(cuid())
+  totalProjects    Int      @default(2500) @map("total_projects")
+  satisfactionRate Int      @default(98) @map("satisfaction_rate")
+  yearsExperience  Int      @default(15) @map("years_experience")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+}

@@ -8,15 +8,36 @@ interface Stat {
   label: string;
 }
 
-const stats: Stat[] = [
-  { value: 2500, suffix: "+", label: "누적 시공 건수" },
-  { value: 98, suffix: "%", label: "고객 만족도" },
-  { value: 15, suffix: "년", label: "업계 경력" },
-];
-
 export default function StatsCounter() {
   const [isVisible, setIsVisible] = useState(false);
+  const [stats, setStats] = useState<Stat[]>([
+    { value: 2500, suffix: "+", label: "누적 시공 건수" },
+    { value: 98, suffix: "%", label: "고객 만족도" },
+    { value: 15, suffix: "년", label: "업계 경력" },
+  ]);
   const sectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // API에서 통계 데이터 가져오기
+    const fetchStats = async () => {
+      try {
+        const res = await fetch("/api/stats");
+        if (res.ok) {
+          const data = await res.json();
+          setStats([
+            { value: data.totalProjects, suffix: "+", label: "누적 시공 건수" },
+            { value: data.satisfactionRate, suffix: "%", label: "고객 만족도" },
+            { value: data.yearsExperience, suffix: "년", label: "업계 경력" },
+          ]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch stats:", error);
+        // 실패 시 기본값 사용
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(

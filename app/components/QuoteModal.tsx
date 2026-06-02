@@ -52,10 +52,16 @@ export default function QuoteModal({ isOpen, onClose }: QuoteModalProps) {
     setIsSubmitting(true);
 
     try {
-      // TODO: 실제 API 호출로 대체
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const res = await fetch("/api/quotes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-      console.log("견적 신청:", formData);
+      if (!res.ok) {
+        throw new Error("Failed to submit quote");
+      }
+
       setSubmitStatus("success");
 
       setTimeout(() => {
