@@ -21,17 +21,20 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* 히어로 - Pexels curtain 검색 1장 */}
+      {/* 히어로 - ymcurtain.com 배경 */}
       <section className="relative w-full min-h-[85vh] flex flex-col items-center justify-center overflow-hidden">
-        {heroPhoto && heroPhoto.src && (
-          <div className="absolute inset-0">
-            <Image src={heroPhoto.src} alt={heroPhoto.alt} fill className="object-cover" priority sizes="100vw" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-black/15" />
-          </div>
-        )}
-        {(!heroPhoto || !heroPhoto.src) && (
-          <div className="absolute inset-0 bg-gradient-to-br from-primary to-primary/80" />
-        )}
+        <div className="absolute inset-0">
+          <Image
+            src="https://lh3.googleusercontent.com/7B5C1AM65TZv2WNvYLK5IYs0hGlIQDTvsstE11NVceUa7dHYQOJ8npYJOsNrR1Tg17DdxZoNQ-UaGwmY_n71Sn1fwVaAfoDBtseae75UiOp6VNKM8xnJKA=w1920-h2560-n"
+            alt="유명커튼블라인드 메인"
+            fill
+            className="object-cover"
+            priority
+            sizes="100vw"
+            unoptimized
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-black/15" />
+        </div>
         <div className="relative z-10 text-center px-4 max-w-2xl">
           <p className="text-white/90 text-xs font-medium tracking-[0.35em] uppercase mb-4">Curtain & Blind</p>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight font-semibold">
@@ -59,19 +62,24 @@ export default async function HomePage() {
             전화 문의부터 시공까지, 한 번에
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-            {serviceSteps.map((item, i) => (
+            {serviceSteps.map((item, i) => {
+              const serviceImages = [
+                "//storage.googleapis.com/i.addblock.net/sample/contents_138_1.png",
+                "//storage.googleapis.com/i.addblock.net/sample/contents_138_4.png",
+                "//storage.googleapis.com/i.addblock.net/sample/contents_138_3.png"
+              ];
+              return (
               <div key={item.step} className="rounded-2xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow border border-black/5">
-                <div className="aspect-[4/3] relative">
-                  {(i === 0 ? PHONE_SERVICE_IMAGE : servicePhotos[i]?.src) && (
-                    <Image
-                      src={i === 0 ? PHONE_SERVICE_IMAGE : servicePhotos[i]!.src}
-                      alt={item.title}
-                      fill
-                      className="object-cover hover:scale-105 transition-transform duration-500"
-                      sizes="(max-width:768px) 100vw, 33vw"
-                    />
-                  )}
-                  <span className="absolute top-4 left-4 text-white/95 text-2xl font-bold tracking-tighter drop-shadow">
+                <div className="aspect-[4/3] relative bg-slate-50 flex items-center justify-center">
+                  <Image
+                    src={`https:${serviceImages[i]}`}
+                    alt={item.title}
+                    width={200}
+                    height={200}
+                    className="object-contain p-8"
+                    unoptimized
+                  />
+                  <span className="absolute top-4 left-4 text-primary text-2xl font-bold tracking-tighter">
                     {item.step}
                   </span>
                 </div>
@@ -80,7 +88,7 @@ export default async function HomePage() {
                   <p className="text-sm text-slate-600 leading-relaxed">{item.desc}</p>
                 </div>
               </div>
-            ))}
+            )}))}
           </div>
         </div>
       </section>
