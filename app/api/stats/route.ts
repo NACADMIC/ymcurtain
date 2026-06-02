@@ -6,6 +6,9 @@ export const dynamic = 'force-dynamic';
 // 사이트 통계 조회
 export async function GET() {
   try {
+    if (!prisma) {
+      return NextResponse.json({ error: "Database not connected" }, { status: 503 });
+    }
     // 첫 번째 통계 레코드 가져오기 (없으면 생성)
     let stats = await prisma.siteStats.findFirst();
 
@@ -32,6 +35,9 @@ export async function GET() {
 // 사이트 통계 수정 (관리자용)
 export async function PATCH(request: Request) {
   try {
+    if (!prisma) {
+      return NextResponse.json({ error: "Database not connected" }, { status: 503 });
+    }
     const body = await request.json();
     const { totalProjects, satisfactionRate, yearsExperience } = body;
 

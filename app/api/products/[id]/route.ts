@@ -8,6 +8,9 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    if (!prisma) {
+      return NextResponse.json({ error: "Database not connected" }, { status: 503 });
+    }
     const product = await prisma.product.findUnique({
       where: { id: params.id },
       include: { category: true, images: true, options: true },
@@ -24,6 +27,9 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
+    if (!prisma) {
+      return NextResponse.json({ error: "Database not connected" }, { status: 503 });
+    }
     const body = await request.json();
     const { name, slug, categoryId, price, salePrice, stock, description, status } = body;
     const product = await prisma.product.update({
@@ -50,6 +56,9 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    if (!prisma) {
+      return NextResponse.json({ error: "Database not connected" }, { status: 503 });
+    }
     await prisma.product.delete({ where: { id: params.id } });
     return NextResponse.json({ ok: true });
   } catch (e) {

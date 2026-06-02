@@ -5,6 +5,9 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
+    if (!prisma) {
+      return NextResponse.json({ error: "Database not connected" }, { status: 503 });
+    }
     const categories = await prisma.category.findMany({
       orderBy: { order: "asc" },
     });
@@ -17,6 +20,9 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    if (!prisma) {
+      return NextResponse.json({ error: "Database not connected" }, { status: 503 });
+    }
     const body = await request.json();
     const { name, slug, description, order, parentId } = body;
     const category = await prisma.category.create({

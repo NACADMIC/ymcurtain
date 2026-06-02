@@ -6,6 +6,9 @@ export const dynamic = 'force-dynamic';
 // 시공 후기 목록 조회
 export async function GET(request: Request) {
   try {
+    if (!prisma) {
+      return NextResponse.json({ error: "Database not connected" }, { status: 503 });
+    }
     const { searchParams } = new URL(request.url);
     const isPublic = searchParams.get("public") === "true";
 
@@ -29,6 +32,9 @@ export async function GET(request: Request) {
 // 시공 후기 생성 (관리자용)
 export async function POST(request: Request) {
   try {
+    if (!prisma) {
+      return NextResponse.json({ error: "Database not connected" }, { status: 503 });
+    }
     const body = await request.json();
     const { name, location, rating, comment, imageUrl, date, order } = body;
 
