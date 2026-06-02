@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = 'force-dynamic';
+
 // 견적 신청 상태/메모 업데이트 (관리자용)
 export async function PATCH(
   request: Request,

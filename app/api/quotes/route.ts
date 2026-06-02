@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = 'force-dynamic';
+
 // 견적 신청 생성 (고객용)
 export async function POST(request: Request) {
   try {
